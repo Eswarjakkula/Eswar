@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Scheduler</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(120deg, #f6d365, #fda085);
+            transition: background 0.5s ease-in-out;
+        }
+        .initial-screen, .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .container {
+            display: none;
+        }
+        h1, h2 {
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #ff7eb3;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.3s ease;
+        }
+        button:hover {
+            background: #ff4f8b;
+            transform: scale(1.05);
+        }
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #ff7eb3;
+            color: white;
+        }
+        .add-post-form {
+            display: none;
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="initial-screen" id="initialScreen">
+        <h1>Social Media Content Scheduler</h1>
+        <button id="letsGoButton">Let's Go</button>
+    </div>
+    <div class="container" id="mainContent">
+        <h1>Social Media Content Scheduler</h1>
+        <div class="calendar">
+            <h2>Content Calendar</h2>
+            <table id="calendarTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Platform</th>
+                        <th>Content</th>
+                        <th>Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <button id="addPostBtn">Add Post</button>
+        </div>
+        <div class="add-post-form" id="addPostForm">
+            <h2>Add New Post</h2>
+            <form id="postForm">
+                <label for="date">Date:</label>
+                <input type="date" id="date" required><br><br>
+                <label for="platform">Platform:</label>
+                <select id="platform" required>
+                    <option value="twitter">Twitter</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="linkedin">LinkedIn</option>
+                </select><br><br>
+                <label for="content">Content:</label><br>
+                <textarea id="content" rows="4" required></textarea><br><br>
+                <label for="time">Time:</label>
+                <input type="time" id="time" required><br><br>
+                <button type="submit">Save Post</button>
+                <button type="button" id="cancelBtn">Cancel</button>
+            </form>
+        </div>
+        
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialScreen = document.getElementById('initialScreen');
+            const mainContent = document.getElementById('mainContent');
+            const letsGoButton = document.getElementById('letsGoButton');
+            const addPostBtn = document.getElementById('addPostBtn');
+            const addPostForm = document.getElementById('addPostForm');
+            const postForm = document.getElementById('postForm');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const calendarTable = document.querySelector('#calendarTable tbody');
+            let posts = JSON.parse(localStorage.getItem('posts')) || [];
+            function renderCalendar() {
+                calendarTable.innerHTML = '';
+                posts.forEach((post, index) => {
+                    let row = calendarTable.insertRow();
+                    row.innerHTML = `<td>${post.date}</td><td>${post.platform}</td><td>${post.content}</td><td>${post.time}</td>
+                                     <td><button onclick="deletePost(${index})">Delete</button></td>`;
+                });
+            }
+            window.deletePost = function(index) {
+                posts.splice(index, 1);
+                localStorage.setItem('posts', JSON.stringify(posts));
+                renderCalendar();
+            };
+            postForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                let newPost = {
+                    date: postForm.date.value,
+                    platform: postForm.platform.value,
+                    content: postForm.content.value,
+                    time: postForm.time.value
+                };
+                posts.push(newPost);
+                localStorage.setItem('posts', JSON.stringify(posts));
+                renderCalendar();
+                postForm.reset();
+                addPostForm.style.display = 'none';
+            });
+            cancelBtn.addEventListener('click', () => addPostForm.style.display = 'none');
+            addPostBtn.addEventListener('click', () => addPostForm.style.display = 'block');
+            letsGoButton.addEventListener('click', () => {
+                initialScreen.style.display = 'none';
+                mainContent.style.display = 'flex';
+                renderCalendar();
+            });
+            renderCalendar();
+        });
+    </script>
+</body>
+</html>
+
+
+
